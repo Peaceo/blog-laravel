@@ -96,6 +96,9 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'from' => ['address' => 'bunmipeace@yahoo.com', 'name' => 'blog-laravel'],
+    'reply_to' => ['address' => 'bunmipeace@yahoo.com', 'name' => 'blog-laravel'],
+
     /*
     |--------------------------------------------------------------------------
     | Markdown Mail Settings
