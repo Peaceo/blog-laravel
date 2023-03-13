@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Post;
@@ -40,14 +41,9 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
         $id = Auth::id();
-        $request->validate([
-            'title' => 'required|string|max:50',
-            'body' => 'required|string|max:255',
-            'file' => 'nullable|image'
-        ]);
 
         $user = User::findorfail($id);
         $post = new Post();
@@ -64,8 +60,13 @@ class PostController extends Controller
         }
 
         $post['image'] = $fileName;
+        // $post= Post::create($request->all());
 
         $user->posts()->save($post);
+        return response()->json([
+            'success' => true,
+            'data' => $post
+        ]);
         return redirect()->route("posts.store")->with('success', 'Post created successfully!');
     }
 
@@ -103,12 +104,10 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $request->validate([
-            'title' => 'required|string',
-            'body' => 'required|string',
-            'file' => 'nullable|image'
+            $this->rules()
         ]);
 
-        if ($request->hasFile('file')) {
+        /* if ($request->hasFile('file')) {
             $imageWithExtension = $request->file('file')->getClientOriginalName(); //Filename with extension
             $myFileName = pathinfo($imageWithExtension, PATHINFO_FILENAME); //extract only the filename without extension
             $extension = $request->file('file')->getClientOriginalExtension();
@@ -121,7 +120,9 @@ class PostController extends Controller
             'title' => $request->title,
             'body' => $request->body, //request('body')
             'image' => $fileName ?? null
-        ]);
+        ]); */
+
+        Post::update($request->all());
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully!');
     }
@@ -136,7 +137,8 @@ class PostController extends Controller
     {
         $post = Post::findorfail($id);
         $post->delete();
-        return redirect()->route("posts.index")->with('success', "Record has been removed");
+        // return redirect()->route("posts.index")->with('success', "Record has been removed");
+        return back()->with('success', "Record has been removed successfully");
     }
 
     public function myDashboard()
@@ -152,4 +154,12 @@ class PostController extends Controller
         $posts = Post::all();
         return view('index')->with('posts', $posts);
     }
+
+    /* public function rules(){
+        return [
+            'title' => 'required|string|max:50',
+            'body' => 'required|string|max:255',
+            'file' => 'nullable|image'
+        ];
+    } */
 }

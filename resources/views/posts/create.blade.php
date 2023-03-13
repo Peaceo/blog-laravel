@@ -12,12 +12,19 @@
                         @csrf
                         <div class="form-group">
                             <label for="">Post Title</label>
-                            <input type="text" name="title" class="form-control">
+                            <input type="text" name="title" value="{{ old('title', "Peace") }}" class="form-control @error('title') is-invalid @enderror">
+                            @error('title')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="">Post Body</label>
-                            <textarea name="body" id="" cols="30" rows="10" class="form-control"></textarea>
+                            <textarea name="body" id="" cols="30" rows="10" class="form-control @error('body') is-invalid @enderror">
+                            </textarea>
+                            @error('body')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>  
                         
                         <div class="form-group mt-4">

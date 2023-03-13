@@ -43,13 +43,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-
-        ]);
+        $request->validate($this->rules());
 
         $user = User::create([
             'name' => $request->name,
@@ -58,6 +52,8 @@ class UserController extends Controller
             'role' => $request->role,
             'password' => Hash::make($request->password),
         ]);
+
+        // $user =  User::create($request->all());
 
         event(new Registered($user));
 
@@ -102,11 +98,7 @@ class UserController extends Controller
     public function update(Request $request, User $customUser)
     {
         $user = $customUser;
-        $request->validate([
-            'name' => 'required|string',
-            'username' => 'required|string',
-            'email' => 'required|email'
-        ]);
+        $request->validate($this->rules());
 
         $user->update([
             'name' => $request->name,
@@ -128,5 +120,16 @@ class UserController extends Controller
         $user = User::findorfail($id);
         $user->delete();
         return redirect()->route('customUser.index')->with('success', 'user has been successfully deleted');
+    }
+
+    protected function rules()
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+
+        ];
     }
 }
